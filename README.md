@@ -54,15 +54,25 @@ starReport 是一个用于自动生成和管理指定 GitHub 仓库 star、commi
         "GITHUB_REPOS": "<repo1,repo2,repo3>",
         "API_KEY": "<你的 API Key>",
         "API_BASE_URL": "<API Base URL>",
-        "API_MODEL": "<模型名称>"
+        "API_MODEL": "<模型名称>",
+        "DATA_FILE":"<数据存放可读性的文件路径，如path/to/writable/directory/data.json>"
       }
     }
   }
 }
 ```
 
+如果是本地运行则替换 `command` 和 `args`：
+```json
+"command": "node",
+"args": [
+  "index.js",
+  "mcp-server"
+],
+```
+
 - `command`：启动命令，通常为 `npx`。
-- `args`：命令行参数，`star-report mcp-server` 启动 MCP 服务。
+- ：命令行参数，`star-report mcp-server` 启动 MCP 服务。
 - `env`：环境变量配置，需根据实际情况填写。
   - `GITHUB_TOKEN`：GitHub 访问令牌。
   - `FEISHU_WEBHOOK`：飞书群机器人 Webhook。
@@ -70,6 +80,17 @@ starReport 是一个用于自动生成和管理指定 GitHub 仓库 star、commi
   - `API_KEY`、`API_BASE_URL`、`API_MODEL`：大模型相关配置。
 
 请勿在公开场合泄露敏感信息。
+
+## 功能演示
+
+- MCP tools：
+![MCP 工具](https://github.com/hu-qi/starReport/blob/main/screenshots/mcp-tools.png)
+
+- 列举功能：
+![func-list](https://github.com/hu-qi/starReport/blob/main/screenshots/func-list.png)
+
+- 飞书消息推送：
+![feishu-push](https://github.com/hu-qi/starReport/blob/main/screenshots/feishu-push.png)
 
 ## 许可证
 

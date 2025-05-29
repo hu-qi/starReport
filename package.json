@@ -1,6 +1,6 @@
 {
   "name": "star-report",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "starReport：用于生成和管理 GitHub 报告，并提供 MCP 服务的 Node.js 工具。",
   "main": "index.js",
   "bin": {
@@ -9,6 +9,7 @@
   "type": "module",
   "scripts": {
     "start": "node index.js",
+    "mcp-server": "node index.js mcp-server",
     "test": "echo \"No test specified\" && exit 0"
   },
   "repository": {

@@ -20,10 +20,24 @@ const API_KEY = process.env.API_KEY || process.env.OPENAI_API_KEY;
 const API_BASE_URL = process.env.API_BASE_URL || "https://api.openai.com/v1";
 const API_MODEL = process.env.API_MODEL || "gpt-4o";
 
-// 文件存储数据
-const DATA_FILE = "data.json";
+// 文件存储数据 - 支持环境变量配置路径
+const DATA_FILE = process.env.DATA_FILE || process.env.HOME ? `${process.env.HOME}/starReport_data.json` : "/tmp/starReport_data.json";
+
+// 内存存储作为备选方案
+let memoryData = {};
 
 // ========== 工具函数 ==========
+
+const checkFileSystemAccess = () => {
+  try {
+    const testFile = DATA_FILE + '.test';
+    fs.writeFileSync(testFile, 'test');
+    fs.unlinkSync(testFile);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
 
 const fetchRepoStats = async (repo) => {
   const headers = {
@@ -52,19 +66,49 @@ const fetchRepoStats = async (repo) => {
 };
 
 const loadData = () => {
-  if (!fs.existsSync(DATA_FILE)) return {};
-  const content = fs.readFileSync(DATA_FILE, "utf-8");
-  if (!content.trim()) return {};
   try {
-    return JSON.parse(content);
+    // 首先尝试从文件加载
+    if (fs.existsSync(DATA_FILE)) {
+      const content = fs.readFileSync(DATA_FILE, "utf-8");
+      if (content.trim()) {
+        const data = JSON.parse(content);
+        // 同步到内存
+        memoryData = { ...data };
+        return data;
+      }
+    }
   } catch (e) {
-    console.error("data.json 解析失败，已重置为空对象", e);
-    return {};
+    console.warn(`无法从文件加载数据 (${DATA_FILE}):`, e.message);
+    console.log("将使用内存存储模式");
   }
+  
+  // 如果文件加载失败，返回内存数据
+  return Object.keys(memoryData).length > 0 ? memoryData : {};
 };
 
 const saveData = (data) => {
-  fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
+  // 总是保存到内存
+  memoryData = { ...data };
+  
+  try {
+    // 尝试保存到文件
+    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
+    console.log(`数据已保存到文件: ${DATA_FILE}`);
+  } catch (e) {
+    console.warn(`无法保存到文件 (${DATA_FILE}):`, e.message);
+    console.log("数据已保存到内存，下次重启将丢失");
+    
+    // 如果是权限问题，尝试保存到 /tmp
+    if (e.code === 'EROFS' || e.code === 'EACCES') {
+      try {
+        const tmpFile = `/tmp/starReport_data_${Date.now()}.json`;
+        fs.writeFileSync(tmpFile, JSON.stringify(data, null, 2));
+        console.log(`数据已备份到: ${tmpFile}`);
+      } catch (tmpError) {
+        console.warn("无法创建临时备份文件:", tmpError.message);
+      }
+    }
+  }
 };
 
 const sendFeishuMessage = async (text) => {
@@ -77,7 +121,7 @@ const sendFeishuMessage = async (text) => {
 
 // ========== 每日任务 ==========
 
-const dailyJob = async (isSendReport = true) => {
+const dailyJob = async () => {
   const data = loadData();
   const today = new Date().toISOString().split("T")[0];
   data[today] = data[today] || {};
@@ -448,6 +492,16 @@ const createSseServer = () => {
 const taskType = process.argv[2] || "daily";
 
 const run = async () => {
+  // 启动时检查文件系统访问权限
+  const hasFileAccess = checkFileSystemAccess();
+  if (!hasFileAccess) {
+    console.warn("⚠️  文件系统只读，将使用内存存储模式");
+    console.log(`📁 尝试的数据文件路径: ${DATA_FILE}`);
+    console.log("💡 可通过环境变量 DATA_FILE 指定可写路径");
+  } else {
+    console.log(`📁 数据文件路径: ${DATA_FILE}`);
+  }
+
   if (taskType === "daily") {
     await dailyJob();
   } else if (taskType === "weekly") {
