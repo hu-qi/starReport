@@ -146,7 +146,7 @@ const dailyJob = async () => {
   }
 
   saveData(data);
-  await sendFeishuMessage(report);
+  // await sendFeishuMessage(report);
   return report;
 };
 
