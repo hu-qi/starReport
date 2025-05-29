@@ -1,10 +1,10 @@
-name: GitHub Weekly Report
+name: GitHub Analysis Report
 
 on:
   workflow_dispatch:  # 仅手动触发
 
 jobs:
-  weekly:
+  analysis:
     runs-on: ubuntu-latest
 
     env:
