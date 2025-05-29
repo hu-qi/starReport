@@ -84,12 +84,15 @@ starReport 是一个用于自动生成和管理指定 GitHub 仓库 star、commi
 ## 功能演示
 
 - MCP tools：
+
 ![MCP 工具](https://github.com/hu-qi/starReport/blob/main/screenshots/mcp-tools.png)
 
 - 列举功能：
+
 ![func-list](https://github.com/hu-qi/starReport/blob/main/screenshots/func-list.png)
 
 - 飞书消息推送：
+
 ![feishu-push](https://github.com/hu-qi/starReport/blob/main/screenshots/feishu-push.png)
 
 ## 许可证
