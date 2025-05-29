@@ -1,0 +1,36 @@
+{
+  "name": "star-report",
+  "version": "1.0.0",
+  "description": "starReport：用于生成和管理 GitHub 报告，并提供 MCP 服务的 Node.js 工具。",
+  "main": "index.js",
+  "bin": {
+    "star-report": "index.js"
+  },
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"No test specified\" && exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hu-qi/starReport.git"
+  },
+  "keywords": [
+    "mcp",
+    "github",
+    "report",
+    "nodejs"
+  ],
+  "author": "huqi",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "express-mcp-handler": "^0.3.0",
+    "node-fetch": "^3.3.2",
+    "node-schedule": "^2.1.1",
+    "openai": "^4.103.0",
+    "zod": "^3.25.34"
+  }
+}
