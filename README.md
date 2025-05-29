@@ -51,7 +51,7 @@ starReport 是一个用于自动生成和管理指定 GitHub 仓库 star、commi
       "env": {
         "GITHUB_TOKEN": "<你的 GitHub Token>",
         "FEISHU_WEBHOOK": "<你的飞书 Webhook>",
-        "GITHUB_REPOS": "<repo1,repo2,repo3>",
+        "REPORT_REPOS": "<repo1,repo2,repo3>",
         "API_KEY": "<你的 API Key>",
         "API_BASE_URL": "<API Base URL>",
         "API_MODEL": "<模型名称>",
@@ -76,7 +76,7 @@ starReport 是一个用于自动生成和管理指定 GitHub 仓库 star、commi
 - `env`：环境变量配置，需根据实际情况填写。
   - `GITHUB_TOKEN`：GitHub 访问令牌。
   - `FEISHU_WEBHOOK`：飞书群机器人 Webhook。
-  - `GITHUB_REPOS`：监控的 GitHub 仓库列表，逗号分隔。
+  - `REPORT_REPOS`：监控的 GitHub 仓库列表，逗号分隔。
   - `API_KEY`、`API_BASE_URL`、`API_MODEL`：大模型相关配置。
 
 请勿在公开场合泄露敏感信息。

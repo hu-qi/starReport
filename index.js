@@ -1,4 +1,4 @@
-// index.js
+#!/usr/bin/env node
 import fs from "fs";
 import fetch from "node-fetch";
 import schedule from "node-schedule";
@@ -11,7 +11,7 @@ import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprot
 
 dotenv.config();
 
-const GITHUB_REPOS = process.env.GITHUB_REPOS.split(",");
+const GITHUB_REPOS = process.env.REPORT_REPOS.split(",");
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const FEISHU_WEBHOOK = process.env.FEISHU_WEBHOOK;
 
@@ -20,8 +20,8 @@ const API_KEY = process.env.API_KEY || process.env.OPENAI_API_KEY;
 const API_BASE_URL = process.env.API_BASE_URL || "https://api.openai.com/v1";
 const API_MODEL = process.env.API_MODEL || "gpt-4o";
 
-// 文件存储数据 - 支持环境变量配置路径
-const DATA_FILE = process.env.DATA_FILE || process.env.HOME ? `${process.env.HOME}/starReport_data.json` : "/tmp/starReport_data.json";
+// 文件存储数据 - 默认当前目录的 data.json
+const DATA_FILE = process.env.DATA_FILE || "data.json";
 
 // 内存存储作为备选方案
 let memoryData = {};
@@ -506,6 +506,12 @@ const run = async () => {
     await dailyJob();
   } else if (taskType === "weekly") {
     await weeklyJob();
+  } else if (taskType === "analysis") {
+    await weeklyJob();
+    const data = loadData();
+    const analysis = await generateAnalysis(data);
+    await sendFeishuMessage(`【智能分析】\n${analysis}`);
+    console.log("【智能分析】\n" + analysis);
   } else if (taskType === "mcp-server") {
     // MCP Server 通过 stdio 运行
     const server = createMcpServer();
@@ -522,7 +528,7 @@ const run = async () => {
       console.log(`🔔 Webhook：http://localhost:${port}/feishu-webhook`);
     });
   } else {
-    console.log("可用的任务类型：daily, weekly, mcp-server, sse-server");
+    console.log("可用的任务类型：daily, weekly, analysis, mcp-server, sse-server");
   }
 };
 

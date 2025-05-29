@@ -1,0 +1,19 @@
+{
+  "2025-05-29": {
+    "datawhalechina/wow-fullstack": {
+      "stars": 190,
+      "commits": 177,
+      "issues": 4
+    },
+    "datawhalechina/wow-rag": {
+      "stars": 183,
+      "commits": 22,
+      "issues": 1
+    },
+    "datawhalechina/wow-agent": {
+      "stars": 105,
+      "commits": 53,
+      "issues": 1
+    }
+  }
+}
