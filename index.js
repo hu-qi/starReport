@@ -535,19 +535,19 @@ const run = async () => {
 // ========== 定时任务启动 ==========
 
 if (taskType === "daily" || taskType === "weekly") {
-  // 每天早上 9 点执行日报（东八区）
-  schedule.scheduleJob("0 9 * * *", async () => {
-    console.log("执行每日任务...");
-    await dailyJob();
-  });
+  // // 每天早上 9 点执行日报（东八区）
+  // schedule.scheduleJob("0 9 * * *", async () => {
+  //   console.log("执行每日任务...");
+  //   await dailyJob();
+  // });
 
-  // 每周三 20:00 执行周报（东八区）
-  schedule.scheduleJob("0 20 * * 3", async () => {
-    console.log("执行周报任务...");
-    await weeklyJob();
-  });
+  // // 每周三 20:00 执行周报（东八区）
+  // schedule.scheduleJob("0 20 * * 3", async () => {
+  //   console.log("执行周报任务...");
+  //   await weeklyJob();
+  // });
 
-  console.log("GitHub 监控服务已启动...");
+  // console.log("GitHub 监控服务已启动...");
   run();
 } else {
   run();
