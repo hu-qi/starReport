@@ -1,9 +1,6 @@
 # .github/workflows/github-monitor.yml
 name: GitHub Monitor
 
-permissions:
-  contents: write
-
 on:
   schedule:
     # 每天 UTC 1:00 = 北京时间 9:00
@@ -14,6 +11,9 @@ on:
 jobs:
   monitor:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
 
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
