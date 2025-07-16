@@ -509,7 +509,16 @@ const run = async () => {
   } else if (taskType === "analysis") {
     await weeklyJob();
     const data = loadData();
-    const analysis = await generateAnalysis(data);
+    // 只获取最近一周的数据
+    const dates = Object.keys(data).sort().reverse().slice(0, 7);
+    const weeklyData = {};
+    dates.forEach(date => {
+      if (data[date]) {
+        weeklyData[date] = data[date];
+      }
+    });
+    
+    const analysis = await generateAnalysis(weeklyData);
     await sendFeishuMessage(`【智能分析】\n${analysis}`);
     console.log("【智能分析】\n" + analysis);
   } else if (taskType === "mcp-server") {
