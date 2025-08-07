@@ -8,6 +8,12 @@ import OpenAI from "openai";
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
+import {
+  SYSTEM_PROMPT_BASE,
+  SYSTEM_PROMPT_SSE,
+  SYSTEM_PROMPT_WEBHOOK,
+  createUserPrompt
+} from './prompts.js';
 
 dotenv.config();
 
@@ -212,109 +218,10 @@ const openai = new OpenAI({
 
 const generateAnalysis = async (data, question = null) => {
   // 使用 BMAD 风格的结构化提示词
-  const systemPrompt = `# GitHub 仓库数据分析专家
-
-## 角色定义
-你是一位资深的 GitHub 仓库数据分析专家，具备以下专业能力：
-- 深度理解开源项目生态和发展规律
-- 精通数据可视化和趋势分析技术
-- 擅长从复杂数据中提取关键洞察
-- 具备丰富的项目管理和技术决策经验
-
-## 核心职责
-1. **数据解读**：准确解析 GitHub 仓库的各项指标数据
-2. **趋势分析**：识别项目发展趋势和关键变化点
-3. **洞察提取**：从数据中发现有价值的业务洞察
-4. **建议输出**：基于分析结果提供可行的改进建议
-
-## 分析框架
-采用多维度分析方法：
-- **定量分析**：基于数据指标的统计分析
-- **定性分析**：结合行业经验的深度解读
-- **对比分析**：横向和纵向的数据对比
-- **预测分析**：基于历史数据的趋势预测
-
-## 输出标准
-- 使用专业的数据分析术语
-- 提供清晰的数据可视化表格
-- 突出关键发现和异常点
-- 给出具体可执行的建议`;
-
-  const userPrompt = question
-    ? `## 分析任务
-
-### 背景信息
-我需要对以下 GitHub 仓库数据进行专业分析，并回答特定问题。
-
-### 数据集
-\`\`\`json
-${JSON.stringify(data, null, 2)}
-\`\`\`
-
-### 用户问题
-${question}
-
-### 分析要求
-请按照以下结构进行分析：
-
-1. **数据概览**
-   - 数据时间范围和覆盖仓库
-   - 关键指标汇总
-
-2. **针对性分析**
-   - 围绕用户问题的深度分析
-   - 相关数据的详细解读
-
-3. **趋势洞察**
-   - 数据变化趋势识别
-   - 关键变化点分析
-
-4. **可视化展示**
-   - 制作数据对比表格
-   - 突出显示重要指标
-
-5. **结论与建议**
-   - 回答用户问题的核心结论
-   - 基于分析的可行建议`
-    : `## 分析任务
-
-### 背景信息
-我需要对以下 GitHub 仓库数据进行全面的专业分析。
-
-### 数据集
-\`\`\`json
-${JSON.stringify(data, null, 2)}
-\`\`\`
-
-### 分析要求
-请按照以下结构进行全面分析：
-
-1. **数据概览**
-   - 数据时间范围和覆盖仓库
-   - 关键指标汇总统计
-
-2. **趋势分析**
-   - Stars 增长趋势分析
-   - Commits 活跃度变化
-   - Issues 处理情况评估
-
-3. **对比分析**
-   - 不同仓库间的横向对比
-   - 时间维度的纵向对比
-   - 关键指标的相关性分析
-
-4. **可视化展示**
-   - 制作详细的数据对比表格
-   - 突出显示异常值和关键变化
-
-5. **深度洞察**
-   - 项目健康度评估
-   - 发展瓶颈识别
-   - 增长机会分析
-
-6. **专业建议**
-   - 基于数据的改进建议
-   - 未来发展策略建议`;
+  const systemPrompt = SYSTEM_PROMPT_BASE;
+  const userPrompt = question 
+    ? createUserPrompt.withQuestion(data, question)
+    : createUserPrompt.comprehensive(data);
 
   const completion = await openai.chat.completions.create({
     model: API_MODEL,
@@ -532,80 +439,8 @@ const createSseServer = () => {
       const data = loadData();
 
       // 使用 BMAD 风格的结构化提示词（SSE 版本）
-      const systemPrompt = `# GitHub 仓库数据分析专家（实时分析）
-
-## 角色定义
-你是一位资深的 GitHub 仓库数据分析专家，专门提供实时数据分析服务，具备以下专业能力：
-- 深度理解开源项目生态和发展规律
-- 精通数据可视化和趋势分析技术
-- 擅长从复杂数据中快速提取关键洞察
-- 具备丰富的项目管理和技术决策经验
-- 能够提供流式、结构化的分析报告
-
-## 核心职责
-1. **实时数据解读**：快速准确解析 GitHub 仓库的各项指标数据
-2. **动态趋势分析**：实时识别项目发展趋势和关键变化点
-3. **即时洞察提取**：从数据中快速发现有价值的业务洞察
-4. **流式建议输出**：基于分析结果提供可行的改进建议
-
-## 分析框架
-采用快速多维度分析方法：
-- **定量分析**：基于数据指标的统计分析
-- **定性分析**：结合行业经验的深度解读
-- **对比分析**：横向和纵向的数据对比
-- **预测分析**：基于历史数据的趋势预测
-
-## 输出标准
-- 使用专业的数据分析术语
-- 提供清晰的数据可视化表格
-- 突出关键发现和异常点
-- 给出具体可执行的建议
-- 保持流式输出的连贯性和可读性`;
-
-      const userPrompt = `## 实时分析任务
-
-### 背景信息
-我需要对以下 GitHub 仓库数据进行全面的专业实时分析。
-
-### 数据集
-\`\`\`json
-${JSON.stringify(data, null, 2)}
-\`\`\`
-
-### 分析要求
-请按照以下结构进行全面的实时流式分析：
-
-1. **数据概览**
-   - 数据时间范围和覆盖仓库
-   - 关键指标汇总统计
-
-2. **趋势分析**
-   - Stars 增长趋势分析
-   - Commits 活跃度变化
-   - Issues 处理情况评估
-
-3. **对比分析**
-   - 不同仓库间的横向对比
-   - 时间维度的纵向对比
-   - 关键指标的相关性分析
-
-4. **可视化展示**
-   - 制作详细的数据对比表格
-   - 突出显示异常值和关键变化
-
-5. **深度洞察**
-   - 项目健康度评估
-   - 发展瓶颈识别
-   - 增长机会分析
-
-6. **专业建议**
-   - 基于数据的改进建议
-   - 未来发展策略建议
-
-### 输出要求
-- 使用 Markdown 格式
-- 保持流式输出的结构化
-- 确保每个部分内容完整`;
+      const systemPrompt = SYSTEM_PROMPT_SSE;
+      const userPrompt = createUserPrompt.sse(data);
 
       const completion = await openai.chat.completions.create({
         model: API_MODEL,
@@ -657,121 +492,10 @@ ${JSON.stringify(data, null, 2)}
       const data = loadData();
 
       // 使用 BMAD 风格的结构化提示词（Webhook 版本）
-      const systemPrompt = `# GitHub 仓库数据分析专家（Webhook 响应）
-
-## 角色定义
-你是一位资深的 GitHub 仓库数据分析专家，专门处理来自 Feishu 的实时查询请求，具备以下专业能力：
-- 深度理解开源项目生态和发展规律
-- 精通数据可视化和趋势分析技术
-- 擅长从复杂数据中快速提取关键洞察
-- 具备丰富的项目管理和技术决策经验
-- 能够提供简洁、准确的即时响应
-
-## 核心职责
-1. **即时数据解读**：快速准确解析 GitHub 仓库的各项指标数据
-2. **快速趋势分析**：实时识别项目发展趋势和关键变化点
-3. **精准洞察提取**：从数据中快速发现有价值的业务洞察
-4. **简洁建议输出**：基于分析结果提供可行的改进建议
-
-## 分析框架
-采用高效多维度分析方法：
-- **定量分析**：基于数据指标的统计分析
-- **定性分析**：结合行业经验的深度解读
-- **对比分析**：横向和纵向的数据对比
-- **预测分析**：基于历史数据的趋势预测
-
-## 输出标准
-- 使用专业的数据分析术语
-- 提供清晰的数据可视化表格
-- 突出关键发现和异常点
-- 给出具体可执行的建议
-- 保持响应的简洁性和准确性`;
-
+      const systemPrompt = SYSTEM_PROMPT_WEBHOOK;
       const userPrompt = text
-        ? `## Webhook 分析任务
-
-### 背景信息
-我需要对以下 GitHub 仓库数据进行专业分析，并回答来自 Feishu 的特定问题。
-
-### 数据集
-\`\`\`json
-${JSON.stringify(data, null, 2)}
-\`\`\`
-
-### 用户问题
-${text}
-
-### 分析要求
-请按照以下结构进行快速精准分析：
-
-1. **数据概览**
-   - 数据时间范围和覆盖仓库
-   - 关键指标汇总
-
-2. **针对性分析**
-   - 围绕用户问题的深度分析
-   - 相关数据的详细解读
-
-3. **趋势洞察**
-   - 数据变化趋势识别
-   - 关键变化点分析
-
-4. **可视化展示**
-   - 制作数据对比表格
-   - 突出显示重要指标
-
-5. **结论与建议**
-   - 回答用户问题的核心结论
-   - 基于分析的可行建议
-
-### 输出要求
-- 使用 Markdown 格式
-- 保持响应简洁明了
-- 确保关键信息突出`
-        : `## Webhook 分析任务
-
-### 背景信息
-我需要对以下 GitHub 仓库数据进行全面的专业分析。
-
-### 数据集
-\`\`\`json
-${JSON.stringify(data, null, 2)}
-\`\`\`
-
-### 分析要求
-请按照以下结构进行全面快速分析：
-
-1. **数据概览**
-   - 数据时间范围和覆盖仓库
-   - 关键指标汇总统计
-
-2. **趋势分析**
-   - Stars 增长趋势分析
-   - Commits 活跃度变化
-   - Issues 处理情况评估
-
-3. **对比分析**
-   - 不同仓库间的横向对比
-   - 时间维度的纵向对比
-   - 关键指标的相关性分析
-
-4. **可视化展示**
-   - 制作详细的数据对比表格
-   - 突出显示异常值和关键变化
-
-5. **深度洞察**
-   - 项目健康度评估
-   - 发展瓶颈识别
-   - 增长机会分析
-
-6. **专业建议**
-   - 基于数据的改进建议
-   - 未来发展策略建议
-
-### 输出要求
-- 使用 Markdown 格式
-- 保持响应简洁明了
-- 确保关键信息突出`;
+        ? createUserPrompt.webhookWithQuestion(data, text)
+        : createUserPrompt.webhookComprehensive(data);
 
       const completion = await openai.chat.completions.create({
         model: API_MODEL,
