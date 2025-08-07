@@ -111,11 +111,39 @@ const saveData = (data) => {
   }
 };
 
-const sendFeishuMessage = async (text) => {
+const sendFeishuMessage = async (content) => {
+  const cardContent = {
+    "schema": "2.0",
+    "config": {
+        "update_multi": true,
+        "style": {
+            "text_size": {
+                "normal_v2": {
+                    "default": "normal",
+                    "pc": "normal",
+                    "mobile": "heading"
+                }
+            }
+        }
+    },
+    "body": {
+        "direction": "vertical",
+        "padding": "12px 12px 12px 12px",
+        "elements": [
+            {
+                "tag": "markdown",
+                "content": content,
+                "text_align": "left",
+                "text_size": "normal_v2",
+                "margin": "0px 0px 0px 0px"
+            }
+        ]
+    }
+}
   await fetch(FEISHU_WEBHOOK, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ msg_type: "text", content: { text } })
+    body: JSON.stringify({ msg_type: "interactive", card: cardContent })
   });
 };
 

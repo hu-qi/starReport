@@ -9,7 +9,15 @@
   "type": "module",
   "scripts": {
     "start": "node index.js",
+    "dev": "node index.js --dev",
     "mcp-server": "node index.js mcp-server",
+    "sse-server": "node index.js sse-server",
+    "daily-report": "node index.js daily-report",
+    "weekly-report": "node index.js weekly-report",
+    "analysis": "node index.js analysis",
+    "health-check": "node index.js health-check",
+    "install-global": "npm install -g .",
+    "uninstall-global": "npm uninstall -g star-report",
     "test": "echo \"No test specified\" && exit 0"
   },
   "repository": {
