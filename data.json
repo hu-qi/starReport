@@ -3585,5 +3585,22 @@
       "commits": 99,
       "issues": 1
     }
+  },
+  "2025-12-30": {
+    "datawhalechina/wow-fullstack": {
+      "stars": 226,
+      "commits": 205,
+      "issues": 7
+    },
+    "datawhalechina/wow-rag": {
+      "stars": 226,
+      "commits": 30,
+      "issues": 1
+    },
+    "datawhalechina/wow-agent": {
+      "stars": 198,
+      "commits": 99,
+      "issues": 1
+    }
   }
 }
