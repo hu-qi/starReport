@@ -5166,5 +5166,22 @@
       "commits": 100,
       "issues": 1
     }
+  },
+  "2026-04-02": {
+    "datawhalechina/wow-fullstack": {
+      "stars": 251,
+      "commits": 212,
+      "issues": 1
+    },
+    "datawhalechina/wow-rag": {
+      "stars": 230,
+      "commits": 31,
+      "issues": 1
+    },
+    "datawhalechina/wow-agent": {
+      "stars": 202,
+      "commits": 100,
+      "issues": 1
+    }
   }
 }
